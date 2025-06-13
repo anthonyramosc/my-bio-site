@@ -3,7 +3,7 @@ import axios from "axios";
 
 const apiService = {
     getAllPython: async <T>(endpoint: string): Promise<T[]> => {
-        const response = await axios.get<T[]>(`http://ctem.ec:8002/${endpoint}`);
+        const response = await axios.get<T[]>(`http://localhost/${endpoint}`);
         return response.data;
     },
 

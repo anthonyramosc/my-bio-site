@@ -1,7 +1,5 @@
-import {type FC, type ReactNode, useState} from 'react';
-
+import {type FC, type ReactNode, useState, useEffect} from 'react';
 import Cookie from 'js-cookie';
-
 import type {LoginParams} from "../types/authTypes.ts";
 import type {AuthResponse} from "../interfaces/Auth.ts";
 import {AuthContext} from '../hooks/useAuthContext.ts'
@@ -10,11 +8,33 @@ import {loginApi} from "../constants/EndpointsRoutes.ts";
 import notificationService from "../service/notificationService.ts";
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({children}) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [userId, setUserId] = useState<string | null>(null);
     const [accessToken, setAccessToken] = useState<string | null>(null);
     const [role, setRole] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    // Check for existing tokens on app startup
+    useEffect(() => {
+        const checkAuth = () => {
+            const token = Cookie.get('accessToken');
+            const userIdFromCookie = Cookie.get('userId');
+            const roleFromCookie = Cookie.get('roleName');
+            
+            if (token && userIdFromCookie) {
+                setIsAuthenticated(true);
+                setUserId(userIdFromCookie);
+                setAccessToken(token);
+                if (roleFromCookie) {
+                    setRole(roleFromCookie);
+                }
+            }
+            
+            setLoading(false);
+        };
+        
+        checkAuth();
+    }, []);
 
     const login = async (email: string, password: string) => {
         try {
@@ -43,14 +63,15 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({children}) => {
 
             return {success: true};
 
-        } catch (error: any) {
+        } catch (error) {
             console.error('Login error:', error);
-            if (error.response) {
-                console.error('Error in server response:', error.response.data);
-            } else if (error.request) {
-                console.error('No response from server:', error.request);
+            const err = error as { response?: { data: unknown }; request?: unknown; message?: string };
+            if (err.response) {
+                console.error('Error in server response:', err.response.data);
+            } else if (err.request) {
+                console.error('No response from server:', err.request);
             } else {
-                console.error('Error while setting up the request', error.message);
+                console.error('Error while setting up the request', err.message);
             }
 
             return {success: false};

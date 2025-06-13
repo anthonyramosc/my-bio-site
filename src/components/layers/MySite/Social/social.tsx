@@ -20,7 +20,7 @@ const Social = () => {
                 <span className="text-white font-medium">Social</span>
             </div>
             <div className="flex items-center space-x-2">
-                <span className="text-white bg-[#404040] px-2 py-1 rounded text-sm">1</span>
+                <span className="text-white bg-[#404040] px-2 py-1 rounded text-sm">5</span>
                 <ChevronRight size={16} className="text-gray-400" />
             </div>
         </div>

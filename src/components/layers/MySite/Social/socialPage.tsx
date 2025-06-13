@@ -48,14 +48,14 @@ const socialMediaPlatforms = [
 interface SocialLink {
     id: string;
     name: string;
-    url: string;
     icon: string;
     color: string;
+    url?: string;
 }
 
 const SocialPage = () => {
     const [selectedSocials, setSelectedSocials] = useState<SocialLink[]>([]);
-    const [editingPlatform, setEditingPlatform] = useState<any>(null);
+    const [editingPlatform, setEditingPlatform] = useState<SocialLink | null>(null);
     const [urlInput, setUrlInput] = useState('');
     const navigate = useNavigate();
 
@@ -63,7 +63,7 @@ const SocialPage = () => {
         navigate(-1);
     };
 
-    const handlePlatformSelect = (platform: any) => {
+    const handlePlatformSelect = (platform: SocialLink) => {
         // Check if already selected
         const existingLink = selectedSocials.find(link => link.name === platform.name);
         if (existingLink) {
@@ -107,19 +107,19 @@ const SocialPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#1a1a1a] text-white">
-            {/* Header */}
-            <div className="flex items-center p-4 border-b border-gray-800">
-                <button
-                    onClick={handleBackClick}
-                    className="text-gray-400 hover:text-white mr-3"
-                >
-                    <ChevronLeft size={20} />
-                </button>
-                <span className="text-white font-medium">Social</span>
-            </div>
+        <div className="flex flex-col items-center w-full min-h-screen py-8">
+            <div className="w-full max-w-2xl p-4 rounded-xl shadow-lg relative bg-[#181818]">
+                {/* Header y Botones de acción */}
+                <div className="flex items-center justify-between mb-8">
+                    <button
+                        onClick={handleBackClick}
+                        className="flex items-center text-gray-300 hover:text-white transition-colors"
+                    >
+                        <ChevronLeft size={16} className="mr-2" />
+                        Social
+                    </button>
+                </div>
 
-            <div className="p-4">
                 {/* URL Input Form - Shows when editing */}
                 {editingPlatform && (
                     <div className="mb-6  rounded-lg p-4">
