@@ -15,8 +15,8 @@ interface UseTemplatesReturn {
     createTemplate: (data: Omit<Platilla, 'id'>) => Promise<Platilla>;
     updateTemplate: (id: string, data: Partial<Platilla>) => Promise<Platilla>;
     deleteTemplate: (id: string) => Promise<void>;
-    getDefaultTemplate: () => Platilla | undefined; // NEW: Get default template
-    isTemplatesLoaded: boolean; // NEW: Check if templates are loaded
+    getDefaultTemplate: () => Platilla | undefined;
+    isTemplatesLoaded: boolean;
 }
 
 export const useTemplates = (): UseTemplatesReturn => {
@@ -31,12 +31,9 @@ export const useTemplates = (): UseTemplatesReturn => {
             setLoading(true);
             setError(null);
 
-            console.log('Fetching templates from:', plantillasApi);
 
             const data = await apiService.getAll<Platilla[]>(plantillasApi);
-            console.log('Templates data received:', data);
 
-            // Validate data structure
             if (!Array.isArray(data)) {
                 throw new Error('La respuesta del servidor no es válida');
             }
@@ -44,7 +41,6 @@ export const useTemplates = (): UseTemplatesReturn => {
             const processedTemplates = data
                 .filter((template: any) => {
                     if (!template || typeof template !== 'object' || !template.id) {
-                        console.warn('Invalid template found:', template);
                         return false;
                     }
                     return template.isActive !== false;
@@ -60,12 +56,11 @@ export const useTemplates = (): UseTemplatesReturn => {
                     isActive: template.isActive !== false
                 }));
 
-            console.log('Processed templates:', processedTemplates);
 
             if (isMountedRef.current) {
                 setTemplates(processedTemplates);
                 setError(null);
-                setIsTemplatesLoaded(true); // Mark as loaded
+                setIsTemplatesLoaded(true);
             }
 
             return processedTemplates;
@@ -75,7 +70,7 @@ export const useTemplates = (): UseTemplatesReturn => {
 
             if (isMountedRef.current) {
                 setError(errorMessage);
-                setIsTemplatesLoaded(true); // Mark as loaded even with error
+                setIsTemplatesLoaded(true);
 
                 if (errorMessage.includes('401')) {
                     message.error('No autorizado. Por favor, inicia sesión nuevamente.');
@@ -109,15 +104,12 @@ export const useTemplates = (): UseTemplatesReturn => {
         return templates.filter(template => template.isActive !== false);
     }, [templates]);
 
-    // NEW: Get default template (first template or template with index 0)
     const getDefaultTemplate = useCallback((): Platilla | undefined => {
         if (!templates.length) return undefined;
 
-        // First try to find template with index 0
         const defaultTemplate = templates.find(template => template.index === 0);
         if (defaultTemplate) return defaultTemplate;
 
-        // Fallback to first template
         return templates[0];
     }, [templates]);
 
@@ -134,7 +126,6 @@ export const useTemplates = (): UseTemplatesReturn => {
             return newTemplate;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Error al crear plantilla';
-            console.error('Error creating template:', error);
             message.error(errorMessage);
             throw error;
         } finally {
@@ -159,7 +150,6 @@ export const useTemplates = (): UseTemplatesReturn => {
             return updatedTemplate as Platilla;
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Error al actualizar plantilla';
-            console.error('Error updating template:', error);
             message.error(errorMessage);
             throw error;
         } finally {
@@ -207,7 +197,7 @@ export const useTemplates = (): UseTemplatesReturn => {
         createTemplate,
         updateTemplate,
         deleteTemplate,
-        getDefaultTemplate, // NEW
-        isTemplatesLoaded // NEW
+        getDefaultTemplate,
+        isTemplatesLoaded
     };
 };

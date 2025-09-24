@@ -235,7 +235,7 @@ const CreateBiositeWizard: React.FC<CreateBiositeWizardProps> = ({
                                         disabled={isLoadingState}
                                     />
                                     <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">
-                                        bio.site/
+                                        vesite/
                                     </span>
                                     <button
                                         onClick={handleNext}

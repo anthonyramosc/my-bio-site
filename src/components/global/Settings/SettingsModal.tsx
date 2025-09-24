@@ -113,7 +113,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
     const canSeeChildBiosites = () => {
         if (!user) return false;
-        return role === 'SUPER_ADMIN';
+        return role === 'SUPER_ADMIN' || role === 'ADMIN';
     };
 
     useEffect(() => {
@@ -332,7 +332,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <Dialog
                 open={isOpen && !showCreateWizard}
                 onClose={onClose}
-                className="fixed inset-0 h-full z-50 flex items-center justify-start bg-black/50"
+                className="fixed inset-0 h-full z-[70] flex items-center justify-start bg-black/50"
             >
                 <Dialog.Panel className="bg-[#FAFFF6] rounded-lg w-full max-w-[320px] h-full text-gray-600 shadow-xl flex flex-col">
                     {/* Header - Fixed */}
@@ -366,7 +366,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                             {isLoadingState ? (
                                 <div className="flex items-center justify-center py-8">
                                     <Loader2 className="h-6 w-6 animate-spin text-gray-400"/>
-                                    <span className="ml-2 text-sm text-gray-500">Cargando biosites...</span>
+                                    <span className="ml-2 text-sm text-gray-500">Cargando vesites...</span>
                                 </div>
                             ) : (
                                 <BiositesList

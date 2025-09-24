@@ -52,7 +52,7 @@ const ShareButton = () => {
                         ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
                         : 'bg-transparent lg:bg-gray-100 text-black hover:bg-gray-100'
                 }`}
-                title={shareUrl || 'Compartir biosite'}
+                title={ 'Compartir vesite'}
             >
                 {buttonContent.icon}
             </button>

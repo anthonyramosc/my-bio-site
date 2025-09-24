@@ -3,6 +3,17 @@ import type { BiositeFull } from "../interfaces/Biosite";
 import type { SocialLink, RegularLink } from "../interfaces/PreviewContext.ts";
 import type {Link} from "../interfaces/Links.ts";
 
+// Link type constants
+const LINK_TYPES = {
+    SOCIAL: 'social',
+    REGULAR: 'regular',
+    APP: 'app',
+    WHATSAPP: 'whatsapp',
+    MUSIC: 'music',
+    VIDEO: 'video',
+    SOCIAL_POST: 'social_post'
+} as const;
+
 interface UseLinkOperationsProps {
     biositeData: BiositeFull | null;
     links: any[];
@@ -52,7 +63,8 @@ export const useLinkOperations = ({
                 url: link.url,
                 icon: iconIdentifier,
                 orderIndex: maxOrderIndex + 1,
-                isActive: true
+                isActive: true,
+                link_type: LINK_TYPES.SOCIAL // Set link_type
             });
 
             console.log("Social link added:", newLink);
@@ -109,6 +121,7 @@ export const useLinkOperations = ({
                 label: updateData.label,
                 url: updateData.url,
                 isActive: updateData.isActive,
+                link_type: LINK_TYPES.SOCIAL
             };
 
             if (updateData.icon) {
@@ -141,7 +154,8 @@ export const useLinkOperations = ({
                 url: link.url,
                 icon: 'link',
                 orderIndex: link.orderIndex,
-                isActive: link.isActive
+                isActive: link.isActive,
+                link_type: LINK_TYPES.REGULAR
             });
 
             console.log("Regular link added:", newLink);
@@ -172,11 +186,14 @@ export const useLinkOperations = ({
                 label: updateData.title,
                 url: updateData.url,
                 isActive: updateData.isActive,
-                orderIndex: updateData.orderIndex
+                orderIndex: updateData.orderIndex,
+                link_type: LINK_TYPES.REGULAR
             };
+
             if (updateData.image !== undefined) {
                 updatePayload.image = updateData.image;
             }
+
             const updatedLink = await updateLink(linkId, updatePayload);
             console.log("Regular link updated:", updatedLink);
             await fetchLinks();
@@ -205,9 +222,11 @@ export const useLinkOperations = ({
         }
     }, [biositeData?.id, reorderLinks, fetchLinks, setRegularLinksState]);
 
-    // Special content management functions
     const getMusicEmbed = useCallback(() => {
-        return links.find(link => link.icon === 'music-embed' && link.isActive);
+        return links.find(link =>
+            (link.link_type === LINK_TYPES.MUSIC || link.icon === 'music-embed') &&
+            link.isActive
+        );
     }, [links]);
 
     const setMusicEmbed = useCallback(async (url: string, note?: string) => {
@@ -223,7 +242,8 @@ export const useLinkOperations = ({
                 await updateLink(existingMusic.id, {
                     label,
                     url,
-                    isActive: !!url
+                    isActive: !!url,
+                    link_type: LINK_TYPES.MUSIC
                 });
             } else {
                 const maxOrderIndex = Math.max(...links.map(l => l.orderIndex), -1);
@@ -233,7 +253,8 @@ export const useLinkOperations = ({
                     url,
                     icon: 'music-embed',
                     orderIndex: maxOrderIndex + 1,
-                    isActive: !!url
+                    isActive: !!url,
+                    link_type: LINK_TYPES.MUSIC
                 });
             }
             await fetchLinks();
@@ -244,7 +265,10 @@ export const useLinkOperations = ({
     }, [biositeData?.id, getMusicEmbed, updateLink, createLink, fetchLinks, links]);
 
     const getSocialPost = useCallback(() => {
-        return links.find(link => link.icon === 'social-post' && link.isActive);
+        return links.find(link =>
+            (link.link_type === LINK_TYPES.SOCIAL_POST || link.icon === 'social-post') &&
+            link.isActive
+        );
     }, [links]);
 
     const setSocialPost = useCallback(async (url: string, note?: string) => {
@@ -260,7 +284,8 @@ export const useLinkOperations = ({
                 await updateLink(existingPost.id, {
                     label,
                     url,
-                    isActive: !!url
+                    isActive: !!url,
+                    link_type: LINK_TYPES.SOCIAL_POST
                 });
             } else {
                 const maxOrderIndex = Math.max(...links.map(l => l.orderIndex), -1);
@@ -270,7 +295,8 @@ export const useLinkOperations = ({
                     url,
                     icon: 'social-post',
                     orderIndex: maxOrderIndex + 1,
-                    isActive: !!url
+                    isActive: !!url,
+                    link_type: LINK_TYPES.SOCIAL_POST
                 });
             }
 
@@ -282,7 +308,10 @@ export const useLinkOperations = ({
     }, [biositeData?.id, getSocialPost, updateLink, createLink, fetchLinks, links]);
 
     const getVideoEmbed = useCallback(() => {
-        return links.find(link => link.icon === 'video-embed' && link.isActive);
+        return links.find(link =>
+            (link.link_type === LINK_TYPES.VIDEO || link.icon === 'video-embed') &&
+            link.isActive
+        );
     }, [links]);
 
     const setVideoEmbed = useCallback(async (url: string, title?: string) => {
@@ -297,7 +326,8 @@ export const useLinkOperations = ({
                 await updateLink(existingVideo.id, {
                     label,
                     url,
-                    isActive: !!url
+                    isActive: !!url,
+                    link_type: LINK_TYPES.VIDEO
                 });
             } else {
                 const maxOrderIndex = Math.max(...links.map(l => l.orderIndex), -1);
@@ -307,7 +337,8 @@ export const useLinkOperations = ({
                     url,
                     icon: 'video-embed',
                     orderIndex: maxOrderIndex + 1,
-                    isActive: !!url
+                    isActive: !!url,
+                    link_type: LINK_TYPES.VIDEO
                 });
             }
 
@@ -336,6 +367,8 @@ export const useLinkOperations = ({
         getSocialPost,
         setSocialPost,
         getVideoEmbed,
-        setVideoEmbed
+        setVideoEmbed,
+        // Constants
+        LINK_TYPES
     };
 };

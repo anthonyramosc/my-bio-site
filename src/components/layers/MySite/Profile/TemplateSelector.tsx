@@ -1,4 +1,3 @@
-// TemplateSelector.tsx - Fixed version with proper validation
 import React, { useState, useEffect } from 'react';
 import { Check, Loader2, AlertCircle } from 'lucide-react';
 import { useTemplates } from '../../../../hooks/useTemplates';

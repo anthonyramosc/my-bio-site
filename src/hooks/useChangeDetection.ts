@@ -1,16 +1,16 @@
-// hooks/useChangeDetection.ts
 import { useState, useEffect, useRef } from 'react';
 import { usePreview } from '../context/PreviewContext.tsx';
-import {useUser} from "./useUser.ts";
+import { useSectionsContext } from '../context/SectionsContext.tsx';
+import { useUser } from "./useUser.ts";
 
 export const useChangeDetection = () => {
     const { biosite, socialLinks, regularLinks, appLinks } = usePreview();
-    const {user} = useUser();
+    const { sections } = useSectionsContext();
+    const { user } = useUser();
     const [hasChanges, setHasChanges] = useState(false);
     const [lastSavedState, setLastSavedState] = useState<string | null>(null);
     const isInitialMount = useRef(true);
 
-    // Función para generar hash del estado actual
     const generateStateHash = () => {
         if (!biosite) return null;
 
@@ -47,44 +47,45 @@ export const useChangeDetection = () => {
                 store: link.store,
                 url: link.url,
                 isActive: link.isActive
+            })),
+            sections: sections.map(section => ({
+                id: section.id,
+                titulo: section.titulo,
+                orderIndex: section.orderIndex,
+                biositeId: section.biositeId
             }))
         };
 
         return JSON.stringify(currentState);
     };
 
-    // Inicializar el estado guardado
     useEffect(() => {
-        if (biosite && isInitialMount.current) {
+        if (biosite && sections.length > 0 && isInitialMount.current) {
             const currentHash = generateStateHash();
             setLastSavedState(currentHash);
             setHasChanges(false);
             isInitialMount.current = false;
         }
-    }, [biosite]);
+    }, [biosite, sections]);
 
-    // Detectar cambios
     useEffect(() => {
-        if (biosite && !isInitialMount.current) {
+        if (biosite && sections.length > 0 && !isInitialMount.current) {
             const currentHash = generateStateHash();
             const changesDetected = currentHash !== lastSavedState;
             setHasChanges(changesDetected);
         }
-    }, [biosite, socialLinks, regularLinks, appLinks, lastSavedState]);
+    }, [biosite, socialLinks, regularLinks, appLinks, sections, lastSavedState]);
 
-    // Función para marcar como guardado
     const markAsSaved = () => {
         const currentHash = generateStateHash();
         setLastSavedState(currentHash);
         setHasChanges(false);
     };
 
-    // Función para forzar actualización
     const forceUpdate = () => {
         setHasChanges(true);
     };
 
-    // Función para resetear estado
     const resetChangeDetection = () => {
         const currentHash = generateStateHash();
         setLastSavedState(currentHash);

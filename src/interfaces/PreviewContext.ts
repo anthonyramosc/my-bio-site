@@ -3,11 +3,14 @@ import type {UUID} from "../types/authTypes.ts";
 
 export interface SocialLink {
     id: string;
+    name: string;
     label: string;
     url: string;
     icon: string;
     color: string;
     isActive: boolean;
+    link_type?: string;
+    isSelected?: boolean;
 }
 
 export interface RegularLink {
@@ -17,6 +20,8 @@ export interface RegularLink {
     image?: string;
     orderIndex: number;
     isActive: boolean;
+    link_type?: string;
+    isSelected?: boolean;
 }
 
 export interface AppLink {
@@ -24,7 +29,21 @@ export interface AppLink {
     store: 'appstore' | 'googleplay';
     url: string;
     isActive: boolean;
+    link_type?: string;
+    isSelected?: boolean;
 }
+
+{/**/}
+    export interface WhatsAppLink {
+        id: string;
+        phone: string;
+        description?: string;
+        message: string;
+        isActive: boolean;
+        link_type?: string;
+        isSelected?: boolean;
+    }
+
 
 export interface CreateBiositeDto {
     ownerId: UUID;
@@ -33,11 +52,20 @@ export interface CreateBiositeDto {
     password?: string;
 }
 
+export interface AdminLinkCreationData {
+    icon: string;
+    url: string;
+    label: string;
+    link_type: string;
+    isSelected: boolean; // This determines if it propagates to children
+}
+
 export interface PreviewContextType {
     biosite: BiositeFull | null;
     socialLinks: SocialLink[];
     regularLinks: RegularLink[];
     appLinks: AppLink[];
+    whatsAppLinks: WhatsAppLink[];
     loading: boolean;
     error: string | null;
     updatePreview: (data: Partial<BiositeFull>) => void;
@@ -45,7 +73,7 @@ export interface PreviewContextType {
     refreshBiosite: () => Promise<void>;
 
     themeColor: string;
-    setThemeColor: (color: string) => Promise<void>;
+    setThemeColor: (color: string, textColor: string, accentColor: string) => Promise<void>;
     fontFamily: string;
     setFontFamily: (font: string) => Promise<void>;
 
@@ -72,13 +100,20 @@ export interface PreviewContextType {
     removeAppLink: (linkId: string) => Promise<void>;
     updateAppLink: (linkId: string, data: Partial<AppLink>) => Promise<void>;
 
+    setWhatsAppLinks: (links: WhatsAppLink[]) => void;
+    addWhatsAppLink: (link: Omit<WhatsAppLink, 'id'>) => Promise<void>;
+    removeWhatsAppLink: (linkId: string) => Promise<void>;
+    updateWhatsAppLink: (linkId: string, data: Partial<WhatsAppLink>) => Promise<void>;
+
     getMusicEmbed: () => any;
     setMusicEmbed: (url: string, note?: string) => Promise<void>;
     getSocialPost: () => any;
     setSocialPost: (url: string, note?: string) => Promise<void>;
     getVideoEmbed: () => any;
     setVideoEmbed: (url: string, title?: string) => Promise<void>;
-
+    getVideoLinks: () => any[];
+    getMusicLinks: () => any[];
+    getSocialPostLinks: () => any[];
     clearError: () => void;
 }
 

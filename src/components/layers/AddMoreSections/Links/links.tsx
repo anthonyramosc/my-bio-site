@@ -1,16 +1,20 @@
 import { useNavigate } from "react-router-dom";
+import { ChevronRight } from "lucide-react";
+import {usePreview} from "../../../../context/PreviewContext.tsx";
 
 const Links = () => {
+    const {regularLinks} = usePreview()
     const navigate = useNavigate();
+    const activeLinks = regularLinks.filter(link => link.isActive);
 
     return (
         <div
             onClick={() => navigate("/links")}
-            className="bg-[#FAFFF6] rounded-lg p-4 mb-4 flex items-center justify-between cursor-pointer  transition-colors"
+            className="bg-[#FAFFF6] rounded-lg p-4  flex items-center justify-between cursor-pointer  transition-colors"
         >
             <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-[#6F4FC1] rounded-lg flex items-center justify-center">
-                    <svg width="50" height="51" viewBox="0 0 50 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="50" height="50" viewBox="0 0 50 51" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
                             d="M6 12.5C6 9.73858 8.23858 7.5 11 7.5H38C40.7614 7.5 43 9.73858 43 12.5V39.5C43 42.2614 40.7614 44.5 38 44.5H11C8.23858 44.5 6 42.2614 6 39.5V12.5Z"
                             fill="#6F4FC1"/>
@@ -18,16 +22,19 @@ const Links = () => {
                             d="M25.6207 22.702L26.7409 23.8214C27.2556 24.336 27.6638 24.9469 27.9424 25.6193C28.2209 26.2917 28.3643 27.0124 28.3643 27.7402C28.3643 28.4679 28.2209 29.1886 27.9424 29.861C27.6638 30.5334 27.2556 31.1443 26.7409 31.6589L26.4607 31.9384C25.9461 32.453 25.3351 32.8612 24.6628 33.1397C23.9904 33.4182 23.2697 33.5616 22.5419 33.5616C21.8142 33.5616 21.0935 33.4182 20.4211 33.1397C19.7488 32.8612 19.1378 32.453 18.6232 31.9384C18.1086 31.4237 17.7004 30.8128 17.4219 30.1404C17.1433 29.468 17 28.7474 17 28.0196C17 27.2918 17.1433 26.5712 17.4219 25.8988C17.7004 25.2264 18.1086 24.6155 18.6232 24.1009L19.7434 25.2211C19.3732 25.5881 19.0791 26.0245 18.8781 26.5055C18.677 26.9864 18.5729 27.5023 18.5718 28.0236C18.5706 28.5449 18.6725 29.0612 18.8714 29.5431C19.0704 30.0249 19.3625 30.4626 19.7311 30.8312C20.0997 31.1998 20.5375 31.492 21.0193 31.6909C21.5011 31.8899 22.0175 31.9917 22.5388 31.9906C23.06 31.9895 23.5759 31.8854 24.0569 31.6843C24.5378 31.4832 24.9743 31.1892 25.3413 30.8189L25.6215 30.5387C26.3636 29.7964 26.7805 28.7898 26.7805 27.7402C26.7805 26.6905 26.3636 25.6839 25.6215 24.9416L24.5013 23.8214L25.6207 22.702ZM30.9392 27.4599L29.8197 26.3405C30.5465 25.595 30.9503 24.5932 30.9436 23.5521C30.9369 22.511 30.5203 21.5144 29.7841 20.7783C29.0479 20.0421 28.0512 19.6257 27.0101 19.6192C25.969 19.6126 24.9673 20.0166 24.2219 20.7434L23.9416 21.0229C23.1995 21.7652 22.7827 22.7718 22.7827 23.8214C22.7827 24.871 23.1995 25.8777 23.9416 26.6199L25.0618 27.7402L23.9416 28.8596L22.8222 27.7402C22.3075 27.2256 21.8993 26.6146 21.6208 25.9422C21.3422 25.2699 21.1989 24.5492 21.1989 23.8214C21.1989 23.0936 21.3422 22.373 21.6208 21.7006C21.8993 21.0282 22.3075 20.4173 22.8222 19.9027L23.1024 19.6232C23.6171 19.1086 24.228 18.7004 24.9004 18.4219C25.5728 18.1433 26.2934 18 27.0212 18C27.749 18 28.4696 18.1433 29.142 18.4219C29.8144 18.7004 30.4253 19.1086 30.9399 19.6232C31.4546 20.1378 31.8628 20.7488 32.1413 21.4211C32.4198 22.0935 32.5631 22.8142 32.5631 23.5419C32.5631 24.2697 32.4198 24.9904 32.1413 25.6628C31.8628 26.3351 31.4546 26.9461 30.9399 27.4607"
                             fill="white"/>
                     </svg>
-
                 </div>
                 <div>
                     <div className="text-black font-medium">Links</div>
-                    <div className="text-gray-400 text-sm">Link Diversos</div>
                 </div>
             </div>
-            <div
-                className="w-6 h-6 border border-gray-600 rounded flex items-center justify-center cursor-pointer hover:bg-[#6F4FC1] hover:border-[#6F4FC1] transition-colors">
-            <span className="text-black text-sm hover:text-white">+</span>
+
+            <div className="flex items-center space-x-2">
+                {activeLinks.length > 0 && (
+                    <span className="text-sm text-black" style={{fontSize:"11px"}}>
+                        {activeLinks.length}
+                    </span>
+                )}
+                <ChevronRight size={16} className="text-black"/>
             </div>
         </div>
     );

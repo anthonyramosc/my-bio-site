@@ -1,6 +1,7 @@
 import type {BiositeThemeConfig} from "../../interfaces/Biosite.ts";
+import imgPng5 from "../../assets/img/ve_logo.svg";
+import React from "react";
 
-import imgP from "../../../public/img/Banner.jpg"
 export const LoadingComponent = ({ themeConfig }: { themeConfig: BiositeThemeConfig }) => (
     <div className="w-full h-full p-5 flex items-center justify-center"
          style={{
@@ -45,13 +46,12 @@ export const NoBiositeComponent = ({ themeConfig }: { themeConfig: BiositeThemeC
                 </svg>
             </div>
             <p className="text-sm" style={{ color: themeConfig.colors.text }}>
-                No hay biosite disponible
+                No hay vesite disponible
             </p>
         </div>
     </div>
 );
 
-// Template 1: Layout por defecto (circular con fondo completo)
 export const BackgroundSection = ({
                                       isExposedRoute,
                                       validBackgroundImage,
@@ -60,11 +60,22 @@ export const BackgroundSection = ({
                                       handleImageLoad,
                                       handleImageError,
                                       biosite,
-                                      themeConfig
+                                      themeConfig,
+                                      handleImageClick
                                   }: any) => (
-    <div className={`relative w-full flex-shrink-0 ${isExposedRoute ? 'h-96' : 'h-48'}`}>
+    <div className={`relative w-full flex-shrink-0 ${isExposedRoute ? 'h-40' : 'h-40 '} ${!isExposedRoute ? '' : 'cursor-pointer'}`}
+         onClick={handleImageClick}>
         {validBackgroundImage ? (
             <>
+                <div className="relative z-50">
+                    <div className="relative">
+                        <img
+                            src={imgPng5}
+                            alt="vector"
+                            className={`absolute ${isExposedRoute ? 'top-22' : 'top-22'}  right-0 w-[70px] sm:w-[70px] md:w-[70px] lg:w-[70px] xl:w-[70px] max-w-none`}
+                        />
+                    </div>
+                </div>
                 {imageLoadStates.background === 'loading' && (
                     <div className="absolute inset-0 flex items-center justify-center"
                          style={{ backgroundColor: themeConfig.colors.profileBackground }}>
@@ -75,13 +86,13 @@ export const BackgroundSection = ({
                 <img
                     src={validBackgroundImage}
                     alt="Background"
-                    className={`w-full object-cover ${isExposedRoute ? 'h-full' : 'h-full'}`}
+                    className={`w-full object-cover ${isExposedRoute ? 'h-full' : 'h-full '}`}
                     onLoadStart={() => handleImageLoadStart('background')}
                     onLoad={() => handleImageLoad('background')}
                     onError={() => handleImageError('background', biosite.backgroundImage)}
                     style={{
                         display: imageLoadStates.background === 'error' ? 'none' : 'block',
-                        clipPath: 'ellipse(100% 80% at 50% 0%)',
+                        clipPath: 'polygon(0 0, 100% 0, 100% 85%, 50% 100%, 0 85%)',
                     }}
                 />
                 {imageLoadStates.background === 'error' && (
@@ -124,9 +135,12 @@ export const AvatarSection = ({
                                   handleImageError,
                                   biosite,
                                   themeConfig,
-                                  defaultAvatar
+                                  defaultAvatar,
+                                  handleImageClick
                               }: any) => (
-    <div className={`flex justify-center ${isExposedRoute ? '-mt-44' : '-mt-24'} relative z-10 mb-4`}>
+
+    <div className={`flex justify-center ${isExposedRoute ? '-mt-14' : '-mt-14'} relative z-10 mb-4 ${!isExposedRoute ? '' : 'cursor-pointer'}`}
+         onClick={handleImageClick}>
         {validAvatarImage ? (
             <div className="relative">
                 {imageLoadStates.avatar === 'loading' && (
@@ -139,7 +153,7 @@ export const AvatarSection = ({
                 <img
                     src={validAvatarImage }
                     alt="Avatar"
-                    className={`${isExposedRoute ? 'w-44 h-44' : 'w-24 h-24'} rounded-full border-3 border-white object-cover shadow-lg`}
+                    className={`${isExposedRoute ? 'w-26 h-26' : 'w-24 h-24'} rounded-full border-3 border-white object-cover shadow-lg`}
                     onLoadStart={() => handleImageLoadStart('avatar')}
                     onLoad={() => handleImageLoad('avatar')}
                     onError={() => handleImageError('avatar', biosite.avatarImage)}
@@ -162,10 +176,10 @@ export const AvatarSection = ({
                 className="w-20 h-20 rounded-full border-3 border-white object-cover shadow-lg mt-5"
             />
         )}
+
     </div>
 );
 
-// Template 2: Layout con dos imágenes cuadradas
 export const TwoSquareImagesSection = ({
                                            isExposedRoute,
                                            validBackgroundImage,
@@ -176,11 +190,13 @@ export const TwoSquareImagesSection = ({
                                            handleImageError,
                                            biosite,
                                            themeConfig,
-                                           defaultAvatar
+                                           defaultAvatar,
+                                           handleImageClick
                                        }: any) => (
     <div className="flex justify-center items-center gap-4 px-4 mb-6 mt-6">
         {/* Primera imagen cuadrada (Avatar) */}
-        <div className="relative">
+        <div className={`relative ${!isExposedRoute ? 'cursor-pointer' : ''}`}
+             onClick={handleImageClick}>
             {validAvatarImage ? (
                 <>
                     {imageLoadStates.avatar === 'loading' && (
@@ -215,6 +231,7 @@ export const TwoSquareImagesSection = ({
                     className="w-32 h-32 rounded-lg object-cover shadow-lg"
                 />
             )}
+
         </div>
 
         {/* Segunda imagen cuadrada (Background) */}
@@ -275,8 +292,9 @@ export const TwoSquareImagesSection = ({
     </div>
 );
 
-export const UserInfoSection = ({ biosite, user, description, themeConfig }: any) => (
-    <div className="text-center px-4 mb-4">
+export const UserInfoSection = ({ biosite, user, description, themeConfig, isExposedRoute, handleUserInfoClick }: any) => (
+    <div className={`text-center px-4 mb-4 ${!isExposedRoute ? 'cursor-pointer' : ''}`}
+         onClick={handleUserInfoClick}>
         <h1 className="text-lg font-bold leading-tight"
             style={{
                 color: themeConfig.colors.text,
@@ -285,7 +303,7 @@ export const UserInfoSection = ({ biosite, user, description, themeConfig }: any
             {biosite.title || user?.name || "Tu nombre aquí"}
         </h1>
 
-        <p className="text-sm mt-2 px-2 leading-relaxed"
+        <p className="text-md mt-2 px-2 leading-relaxed"
            style={{
                color: themeConfig.colors.text,
                opacity: 0.8,
@@ -301,44 +319,89 @@ export const SocialLinksSection = ({
                                        isExposedRoute,
                                        findPlatformForLink,
                                        handleSocialClick,
-                                       themeConfig
-                                   }: any) => (
-    realSocialLinks.length > 0 && (
-        <div className="px-4 mb-4">
-            <div className="flex justify-center items-center gap-3 flex-wrap">
-                {realSocialLinks.map((link: any) => {
-                    const platform = findPlatformForLink(link);
+                                       themeConfig,
+                                       handleSocialLinkClick
+                                   }: any) => {
 
-                    return (
-                        <a
-                            key={link.id}
-                            href={isExposedRoute ? link.url : undefined}
-                            target={isExposedRoute ? "_blank" : undefined}
-                            rel={isExposedRoute ? "noopener noreferrer" : undefined}
-                            onClick={isExposedRoute ? undefined : handleSocialClick}
-                            className={`w-5 h-5 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 ${!isExposedRoute ? 'cursor-pointer' : ''}`}
-                            style={{
-                                backgroundColor: 'gray',
-                                transform: themeConfig.isAnimated ? 'scale(1)' : 'none'
-                            }}
-                        >
-                            {platform?.icon ? (
-                                <img
-                                    src={platform.icon}
-                                    alt={link.label}
-                                    className="w-4 h-4 filter text-black brightness-0 invert"
-                                    style={{color:'black'}}
-                                />
-                            ) : (
-                                <span className="text-white text-sm">🔗</span>
-                            )}
-                        </a>
-                    );
-                })}
+    const isDarkTheme = () => {
+
+        const backgroundColor = themeConfig.colors.background;
+
+        if (backgroundColor.includes('gradient')) {
+            return false;
+        }
+
+        const hex = backgroundColor.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+
+        return luminance < 0.5;
+    };
+
+    const getIconClassName = () => {
+        return isDarkTheme()
+            ? "w-6 h-6 invert brightness-0 contrast-100"
+            : "w-6 h-6";
+    };
+
+    return (
+        realSocialLinks.length > 0 && (
+            <div className="px-4 mb-4">
+                <div className="flex justify-center items-center gap-4 flex-wrap">
+                    {realSocialLinks.map((link: any) => {
+                        const platform = findPlatformForLink(link);
+
+                        return isExposedRoute ? (
+                            <button
+                                key={link.id}
+                                onClick={() => handleSocialLinkClick ? handleSocialLinkClick(link.id, link.url) : window.open(link.url, '_blank')}
+                                className="w-5 h-5 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.20] active:scale-[0.98]"
+                                style={{
+                                    color: themeConfig.colors.text,
+                                }}
+                            >
+                                {platform?.icon ? (
+                                    <img
+                                        src={platform.icon}
+                                        alt={link.label}
+                                        className={getIconClassName()}
+                                        style={{ color: themeConfig.colors.text }}
+                                    />
+                                ) : (
+                                    <span className="text-white text-sm">🔗</span>
+                                )}
+                            </button>
+                        ) : (
+                            <a
+                                key={link.id}
+                                href={undefined}
+                                onClick={handleSocialClick}
+                                className="w-5 h-5 gap-3 rounded-lg flex items-center justify-center shadow-md hover:shadow-lg transition-all duration-300 cursor-pointer hover:scale-[1.20] active:scale-[0.98]"
+                                style={{
+                                    color: themeConfig.colors.text,
+                                }}
+                            >
+                                {platform?.icon ? (
+                                    <img
+                                        src={platform.icon}
+                                        alt={link.label}
+                                        className={getIconClassName()}
+                                        style={{ color: themeConfig.colors.text }}
+                                    />
+                                ) : (
+                                    <span className="text-white text-sm">🔗</span>
+                                )}
+                            </a>
+                        );
+                    })}
+                </div>
             </div>
-        </div>
-    )
-);
+        )
+    );
+};
 
 const placeholderLinkImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23f3f4f6' rx='6'/%3E%3Cpath d='M10 10h20v20H10z' fill='%23d1d5db'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%239ca3af'/%3E%3Cpath d='M12 28l8-6 8 6H12z' fill='%239ca3af'/%3E%3C/svg%3E";
 
@@ -346,50 +409,128 @@ export const RegularLinksSection = ({
                                         regularLinksData,
                                         isExposedRoute,
                                         handleLinksClick,
-                                        themeConfig
+                                        themeConfig,
+                                        handleLinkClick
                                     }: any) => (
     regularLinksData.length > 0 && (
-        <div className="px-4 pb-8 space-y-2">
-            {regularLinksData.map((link: any) => (
-                <a
-                    key={link.id}
-                    href={isExposedRoute ? link.url : undefined}
-                    target={isExposedRoute ? "_blank" : undefined}
-                    rel={isExposedRoute ? "noopener noreferrer" : undefined}
-                    onClick={isExposedRoute ? undefined : handleLinksClick}
-                    className={`w-full p-2 rounded-lg bg-white text-center shadow-lg transition-all flex flex-wrap duration-200 hover:shadow-md ${!isExposedRoute ? 'cursor-pointer' : ''}`}
-                    style={{
-                        transform: themeConfig.isAnimated ? 'scale(1)' : 'none'
-                    }}
-                >
-                    {link.image && (
-                        <div className="w-10 h-10 rounded-lg overflow-hidden mr-2 flex-shrink-0">
-                            <img
-                                key={link.id}
-                                src={link.image}
-                                alt={link.title}
-                                className="w-full h-full object-cover"
-                            />
+        <div className="px-4 pb-4 space-y-2">
+            {regularLinksData.map((link: any) => {
+
+
+
+                return isExposedRoute ? (
+                    <button
+                        key={link.id}
+                        onClick={() => handleLinkClick ? handleLinkClick(link.id, link.url) : window.open(link.url, '_blank')}
+                        className="w-full p-2  text-center items-center shadow-lg transition-all flex flex-wrap duration-200 hover:shadow-md cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                        style={{
+                            transform: themeConfig.isAnimated ? 'scale(1)' : 'none',
+                            backgroundColor: themeConfig.colors.accent,
+                            background: themeConfig.colors.accent
+                        }}
+                    >
+                        {link.image && (
+                            <div className="w-10 h-10  bg-white rounded-lg overflow-hidden mr-2 flex-shrink-0">
+                                <img
+                                    src={link.image}
+                                    alt={link.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        )}
+                        {!link.image && (
+                            <div className="w-10 h-10 rounded-lg overflow-hidden mr-2 flex-shrink-0">
+                                <img
+                                    src={placeholderLinkImage}
+                                    alt={link.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        )}
+                        <div className="flex flex-col justify-center ml-2 flex-1 text-left ">
+                            <div className="flex items-center">
+                                <span className="font-medium text-xs truncate">
+                                    {link.title}
+                                </span>
+                            </div>
                         </div>
-                    )}
-                    {!link.image && (
-                        <div className="w-10 h-10 rounded-lg overflow-hidden mr-2 flex-shrink-0">
-                            <img
-                                src={placeholderLinkImage}
-                                alt={link.title}
-                                className="w-full h-full object-cover"
-                            />
+                        <div className="flex-shrink-0 ml-2">
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                className="opacity-60"
+                            >
+                                <path
+                                    d="M6 12L10 8L6 4"
+                                    stroke={themeConfig.colors.text || '#ffffff'}
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
                         </div>
-                    )}
-                    <div className="grid grid-cols-1 gap-1">
-                        <div className="flex items-center">
-                            <span className="font-medium text-xs truncate">
-                                {link.title}
-                            </span>
+
+                    </button>
+                ) : (
+                    <a
+                        key={link.id}
+                        href={undefined}
+                        onClick={handleLinksClick}
+                        className="w-full p-2 items-center  text-center shadow-lg transition-all flex flex-wrap duration-200 hover:shadow-md cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+                        style={{
+                            transform: themeConfig.isAnimated ? 'scale(1)' : 'none',
+                            backgroundColor: themeConfig.colors.accent,
+                            background: themeConfig.colors.accent
+                        }}
+                    >
+                        {link.image && (
+                            <div className="w-10 h-10 rounded-lg bg-white overflow-hidden mr-2 flex-shrink-0">
+                                <img
+                                    key={link.id}
+                                    src={link.image}
+                                    alt={link.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        )}
+                        {!link.image && (
+                            <div className="w-10 h-10 rounded-lg overflow-hidden mr-2 flex-shrink-0">
+                                <img
+                                    src={placeholderLinkImage}
+                                    alt={link.title}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        )}
+                        <div className="flex flex-col justify-center ml-2 flex-1 text-left ">
+                            <div className="flex items-center">
+                                <span className="font-medium text-md truncate">
+                                    {link.title}
+                                </span>
+                            </div>
                         </div>
-                    </div>
-                </a>
-            ))}
+                        <div className="flex-shrink-0 ml-2">
+                            <svg
+                                width="16"
+                                height="16"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                className="opacity-60"
+                            >
+                                <path
+                                    d="M6 12L10 8L6 4"
+                                    stroke={themeConfig.colors.text || '#ffffff'}
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                />
+                            </svg>
+                        </div>
+                    </a>
+                );
+            })}
         </div>
     )
 );

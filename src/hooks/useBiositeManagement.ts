@@ -55,7 +55,7 @@ export const useBiositeOperations = ({
         }
     }, [biositeData, setBiosite]);
 
-    const setThemeColor = useCallback(async (color: string) => {
+    const setThemeColor = useCallback(async (color: string, textColor:string, accentColor: string) => {
         if (!biositeData?.id) {
             throw new Error("No biosite available");
         }
@@ -66,8 +66,8 @@ export const useBiositeOperations = ({
                 primary: color,
                 secondary: color,
                 background: color,
-                text: '#000000',
-                accent: color,
+                text: textColor,
+                accent: accentColor,
                 profileBackground: color
             };
             const updateData: BiositeUpdateDto = {
@@ -77,7 +77,6 @@ export const useBiositeOperations = ({
                 themeId: biositeData.themeId,
                 colors: JSON.stringify(colorsObject),
                 fonts: biositeData.fonts || fontFamily,
-                avatarImage: biositeData.avatarImage || '',
                 backgroundImage: biositeData.backgroundImage || '',
                 isActive: biositeData.isActive
             };
@@ -101,6 +100,7 @@ export const useBiositeOperations = ({
         }
 
         try {
+
             setFontFamilyState(font);
 
             let colorsString: string;
@@ -109,6 +109,7 @@ export const useBiositeOperations = ({
             } else {
                 colorsString = JSON.stringify(biositeData.colors);
             }
+
             const updateData: BiositeUpdateDto = {
                 ownerId: biositeData.ownerId,
                 title: biositeData.title,
@@ -116,18 +117,24 @@ export const useBiositeOperations = ({
                 themeId: biositeData.themeId,
                 colors: colorsString,
                 fonts: font,
-                avatarImage: biositeData.avatarImage || '',
                 backgroundImage: biositeData.backgroundImage || '',
                 isActive: biositeData.isActive
             };
 
-            await updateBiosite(updateData);
+            const updatedBiosite = await updateBiosite(updateData);
+
+            if (updatedBiosite) {
+                setBiosite(updatedBiosite);
+                console.log('Font updated successfully, biosite refreshed:', font);
+            }
+
         } catch (error) {
             console.error("Error updating font family:", error);
+            // Revertir el estado en caso de error
             setFontFamilyState(biositeData.fonts || 'Inter');
             throw error;
         }
-    }, [biositeData, updateBiosite, setFontFamilyState]);
+    }, [biositeData, updateBiosite, setFontFamilyState, setBiosite]);
 
     const createNewBiosite = useCallback(async (data: CreateBiositeDto): Promise<BiositeFull | null> => {
         try {
@@ -182,7 +189,6 @@ export const useBiositeOperations = ({
 
     const loadBiositeById = useCallback(async (biositeId: string): Promise<BiositeFull | null> => {
         try {
-            console.log('Loading biosite by ID:', biositeId);
             const result = await switchBiosite(biositeId);
             if (result) {
                 setBiosite(result);
@@ -190,7 +196,6 @@ export const useBiositeOperations = ({
                 Cookies.set('biositeId', biositeId);
                 Cookies.set('userId', result.ownerId);
 
-                console.log('Biosite loaded successfully:', result);
             }
             return result;
         } catch (error) {

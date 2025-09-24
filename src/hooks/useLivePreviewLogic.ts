@@ -15,7 +15,7 @@ export const useLivePreviewLogic = () => {
         handleImageLoad,
         handleImageError,
         handleImageLoadStart,
-        parsedColors,
+        parseColors,
         regularLinksData,
         socialLinksData,
         validBackgroundImage,
@@ -28,10 +28,8 @@ export const useLivePreviewLogic = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Determinar si estamos en la ruta expuesta
     const isExposedRoute = location.pathname === '/expoced';
 
-    // Fetch user data when component mounts
     useEffect(() => {
         const userId = Cookies.get('userId');
         if (userId && !user) {
@@ -45,46 +43,59 @@ export const useLivePreviewLogic = () => {
                 colors: {
                     primary: biosite.theme.config.colors.primary,
                     secondary: biosite.theme.config.colors.secondary,
-                    accent: biosite.theme.config.colors.accent || biosite.theme.config.colors.primary,
+                    accent: biosite.theme.config.colors.accent,
                     background: biosite.theme.config.colors.background || themeColor || '#ffffff',
                     text: biosite.theme.config.colors.text || '#000000',
                     profileBackground: biosite.theme.config.colors.profileBackground || themeColor || '#ffffff'
                 },
                 fonts: {
-                    primary: biosite.theme.config.fonts.primary || fontFamily || 'Inter',
-                    secondary: biosite.theme.config.fonts.secondary || fontFamily || 'Lato'
+                    primary: biosite.theme.config.fonts.primary || biosite?.fonts || fontFamily || 'Inter',
+                    secondary: biosite.theme.config.fonts.secondary || biosite?.fonts || fontFamily || 'Lato'
                 },
                 isDark: biosite.theme.config.isDark || false,
                 isAnimated: biosite.theme.config.isAnimated || false
             };
         }
 
+        const colors = parseColors(biosite?.colors);
+
         return {
             colors: {
-                primary: parsedColors.primary,
-                secondary: parsedColors.secondary,
-                accent: parsedColors.accent || parsedColors.primary,
-                background: themeColor || '#ffffff',
-                text: parsedColors.text || '#000000',
-                profileBackground: parsedColors.profileBackground || themeColor || '#ffffff'
+                primary: colors.primary || '#f3f4f6',
+                secondary: colors.secondary,
+                accent: colors.accent ,
+                background: colors.background || themeColor || '#ffffff',
+                text: colors.text || themeColor || '#000000',
+                profileBackground: colors.profileBackground || colors.background || themeColor || '#ffffff'
             },
             fonts: {
-                primary: fontFamily || 'Inter',
-                secondary: fontFamily || 'Lato'
+                primary: biosite?.fonts || fontFamily || 'Inter',
+                secondary: biosite?.fonts || fontFamily ||'Lato'
             },
             isDark: false,
             isAnimated: false
         };
     };
 
+    // Enhanced filterRealSocialLinks using link_type
     const filterRealSocialLinks = (links: SocialLink[]) => {
         return links.filter(link => {
             if (!link.isActive) return false;
 
+            // Check if this link has a specific link_type that should be excluded from social
+            const linkData = socialLinksData.find(sl => sl.id === link.id);
+            if (linkData && linkData.link_type) {
+                // If it has a specific type and it's not social, exclude it
+                if (!['social', 'whatsapp'].includes(linkData.link_type)) {
+                    return false;
+                }
+            }
+
+            // Original exclusion logic as fallback
             const excludedKeywords = [
-                'spotify', 'music', 'apple music', 'soundcloud', 'audio',
-                'youtube', 'video', 'vimeo', 'tiktok video',
-                'post', 'publicacion', 'contenido',
+                'open.spotify.com/embed', 'music', 'soundcloud', 'audio',
+                'youtube.com/watch', 'video', 'vimeo', 'tiktok video',
+                'post', 'publicacion', 'contenido', 'api.whatsapp.com',
                 'music embed', 'video embed', 'social post',
                 'embed', 'player'
             ];
@@ -97,6 +108,21 @@ export const useLivePreviewLogic = () => {
             );
 
             if (isExcluded) return false;
+
+            // Exclude WhatsApp API links but allow wa.me links
+            if (urlLower.includes("api.whatsapp.com")) {
+                return false;
+            }
+
+            // Allow YouTube channel links in social
+            if (urlLower.includes('youtube.com/@')) {
+                return true;
+            }
+
+            // Allow wa.me WhatsApp links in social
+            if (urlLower.includes("wa.me/") || urlLower.includes("whatsapp.com")) {
+                return true;
+            }
 
             const platform = findPlatformForLink(link);
             return platform !== undefined && platform !== null;
@@ -131,7 +157,7 @@ export const useLivePreviewLogic = () => {
         return url.includes('instagram.com') && (url.includes('/p/') || url.includes('/reel/'));
     };
 
-    // Funciones para manejar la navegación
+    // Click handlers
     const handleMusicClick = (e: React.MouseEvent) => {
         if (!isExposedRoute) {
             e.preventDefault();
@@ -167,7 +193,59 @@ export const useLivePreviewLogic = () => {
         }
     };
 
+    const handleImageClick = (e: React.MouseEvent) => {
+        if (!isExposedRoute) {
+            e.preventDefault();
+            navigate('/profile');
+        }
+    };
 
+    const handleAppClick = (e: React.MouseEvent) => {
+        if (!isExposedRoute) {
+            e.preventDefault();
+            navigate('/app');
+        }
+    };
+
+    const handleUserInfoClick = (e: React.MouseEvent) => {
+        if (!isExposedRoute) {
+            e.preventDefault();
+            navigate('/profile');
+        }
+    };
+
+    const handleVCardClick = (e: React.MouseEvent) => {
+        if (!isExposedRoute) {
+            e.preventDefault();
+            navigate('/VCard');
+        }
+    };
+
+    const handleWhatsAppClick = (e: React.MouseEvent) => {
+        if (!isExposedRoute) {
+            e.preventDefault();
+            navigate('/whatsApp');
+        }
+    };
+
+    // Add analytics handlers for exposed route
+    const handleLinkClick = (linkId: string, url: string) => {
+        if (isExposedRoute) {
+            // Track link click analytics here
+            console.log('Link clicked:', linkId, url);
+            // You can add analytics tracking here
+            window.open(url, '_blank');
+        }
+    };
+
+    const handleSocialLinkClick = (linkId: string, url: string) => {
+        if (isExposedRoute) {
+            // Track social link click analytics here
+            console.log('Social link clicked:', linkId, url);
+            // You can add analytics tracking here
+            window.open(url, '_blank');
+        }
+    };
 
     const themeConfig = getThemeConfig();
     const musicEmbed = getMusicEmbed();
@@ -194,6 +272,8 @@ export const useLivePreviewLogic = () => {
         validBackgroundImage,
         validAvatarImage,
         findPlatformForLink,
+        filterRealSocialLinks,
+        getSpotifyEmbedUrl,
         isExposedRoute,
         themeConfig,
         musicEmbed,
@@ -201,14 +281,20 @@ export const useLivePreviewLogic = () => {
         videoEmbed,
         description,
         defaultAvatar,
-        getSpotifyEmbedUrl,
+        isInstagramUrl,
         getYouTubeEmbedUrl,
         getInstagramEmbedUrl,
-        isInstagramUrl,
         handleMusicClick,
         handleVideoClick,
         handleSocialPostClick,
         handleLinksClick,
-        handleSocialClick
+        handleSocialClick,
+        handleImageClick,
+        handleUserInfoClick,
+        handleAppClick,
+        handleVCardClick,
+        handleWhatsAppClick,
+        handleLinkClick,
+        handleSocialLinkClick,
     };
 };

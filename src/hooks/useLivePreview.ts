@@ -10,23 +10,59 @@ export const useLivePreview = () => {
     const [imageLoadStates, setImageLoadStates] = useState<{[key: string]: 'loading' | 'loaded' | 'error'}>({});
 
     const parseColors = (colors: string | BiositeColors | null | undefined): BiositeColors => {
-        const defaultColors: BiositeColors = { primary: '#3B82F6', secondary: '#1F2937' };
+        const defaultColors: BiositeColors = {
+            primary: '#f3f4f6',
+            secondary: '#f3f4f6',
+            background: '#ffffff',
+            text: '#000000'
+        };
 
         if (!colors) return defaultColors;
 
         if (typeof colors === 'string') {
             try {
                 const parsed = JSON.parse(colors);
-                return { ...defaultColors, ...parsed };
+                return {
+                    ...defaultColors,
+                    ...parsed,
+                    // Asegurar que background y text existen
+                    background: parsed.background || defaultColors.background,
+                    text: parsed.text || defaultColors.text
+                };
             } catch (e) {
                 console.warn('Error parsing colors:', e);
-                return defaultColors;
+                // Si es un string simple, asumir que es el color de fondo
+                return {
+                    ...defaultColors,
+                    background: colors,
+                    text: defaultColors.text,
+                };
             }
         } else if (colors && typeof colors === 'object') {
-            return { ...defaultColors, ...colors };
+            return {
+                ...defaultColors,
+                ...colors,
+                background: colors.background || defaultColors.background,
+                text: colors.text || defaultColors.text
+            };
         }
 
         return defaultColors;
+    };
+
+    const parseFont = (fonts: string | null | undefined): string => {
+        const defaultFont = 'Inter';
+
+        if (!fonts) return defaultFont;
+
+        if (typeof fonts === 'string') {
+            // Si es un string válido, usarlo directamente
+            if (fonts.trim().length > 0) {
+                return fonts.trim();
+            }
+        }
+
+        return defaultFont;
     };
 
     const isValidImageUrl = (url: string | null | undefined): boolean => {
@@ -46,7 +82,6 @@ export const useLivePreview = () => {
         try {
             const urlObj = new URL(url);
             const isHttps = ['http:', 'https:'].includes(urlObj.protocol);
-
 
             return isHttps ;
         } catch {
@@ -77,7 +112,15 @@ export const useLivePreview = () => {
 
     const getSocialLinks = () => {
         if (!socialLinks || socialLinks.length === 0) return [];
-        return socialLinks.filter(link => link.isActive);
+
+        return socialLinks.filter(link => {
+            if (!link.isActive) return false;
+
+            const urlLower = link.url.toLowerCase();
+            if (urlLower.includes("api.whatsapp.com")) return false;
+
+            return true;
+        });
     };
 
     const findPlatformForLink = (link: SocialLink) => {
@@ -129,6 +172,8 @@ export const useLivePreview = () => {
         socialLinksData,
         validBackgroundImage,
         validAvatarImage,
+        parseColors,
+        parseFont,
 
         // Utilidades
         findPlatformForLink

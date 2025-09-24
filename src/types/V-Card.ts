@@ -9,7 +9,7 @@ export interface VCardData {
 
 
 export interface BusinessCard {
-    id: string;
+    id?: string;
     ownerId: string;
     slug?: string;
     qrCodeUrl?: string;
@@ -25,6 +25,7 @@ export interface CreateBusinessCardDto {
 }
 
 export interface UpdateBusinessCardDto {
+    id?: string;
     ownerId: string;
     data?: any;
     isActive?: boolean;

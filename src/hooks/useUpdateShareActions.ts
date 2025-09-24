@@ -31,7 +31,10 @@ export const useUpdateShareActions = () => {
 
         // Construir la URL correcta usando el origen actual
         const baseUrl = window.location.origin;
-        const shareUrl = `${baseUrl}/vesite/Ve.site/${biosite.slug}`;
+        const isDev = baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1');
+        const shareUrl = isDev
+        ? `${baseUrl}/vesite/${biosite.slug}`
+        : `${baseUrl}/${biosite.slug}`;
 
         console.log('Sharing URL:', shareUrl); // Para debug
 
@@ -130,7 +133,7 @@ export const useUpdateShareActions = () => {
     // Función para obtener la URL de compartir
     const getShareUrl = () => {
         if (!canShare()) return null;
-        return `${window.location.origin}/Ve.site/${biosite!.slug}`;
+        return `${window.location.origin}/${biosite!.slug}`;
     };
 
     return {

@@ -30,7 +30,7 @@ const Profile = () => {
                 </div>
                 <span className="text-black font-medium">Perfil</span>
             </div>
-            <ChevronRight size={16} className="text-gray-400"/>
+            <ChevronRight size={16} className="text-black"/>
         </div>
     );
 };

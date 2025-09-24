@@ -9,8 +9,8 @@
 
 .phone-container {
     position: relative;
-    width: 320px;
-    height: 640px;
+    width: 400px;
+    height: 740px;
     border-radius: 20px;
     padding: 8px;
 }
@@ -246,7 +246,8 @@
 
 @media (max-width: 480px) {
     .phone-container {
-        width: 260px;
-        height: 520px;
+        width: 360px;
+        height: 620px;
+        margin-top: -80px;
     }
 }

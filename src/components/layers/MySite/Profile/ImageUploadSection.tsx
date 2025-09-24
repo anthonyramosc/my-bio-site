@@ -24,7 +24,6 @@ const ImageUploadSection = ({
 
     const placeholderBackground = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='120' viewBox='0 0 200 120'%3E%3Crect width='200' height='120' fill='%23f3f4f6'/%3E%3Cpath d='M40 40h120v40H40z' fill='%23d1d5db'/%3E%3Ccircle cx='60' cy='50' r='8' fill='%239ca3af'/%3E%3Cpath d='M80 65l20-15 40 25H80z' fill='%239ca3af'/%3E%3C/svg%3E";
 
-    // Enhanced image validation
     const isValidImageUrl = (url: string | null | undefined): boolean => {
         if (!url || typeof url !== 'string') return false;
 
@@ -42,8 +41,8 @@ const ImageUploadSection = ({
             const urlObj = new URL(url);
             const isHttps = ['http:', 'https:'].includes(urlObj.protocol);
             const hasValidExtension = /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(url) ||
-                url.includes('/img/') || // Para tu servidor
-                url.includes('image-'); // Para archivos con formato image-*
+                url.includes('/img/') ||
+                url.includes('image-');
 
 
             return isHttps && (hasValidExtension || !urlObj.pathname.includes('.'));
@@ -53,17 +52,15 @@ const ImageUploadSection = ({
         }
     };
 
-    // File validation function
     const validateFile = (file: File): boolean => {
-        // Check file type
+
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
         if (!allowedTypes.includes(file.type)) {
             message.error('Formato de archivo no válido. Solo se permiten: JPG, PNG, WebP, GIF');
             return false;
         }
 
-        // Check file size (5MB limit)
-        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
             message.error('El archivo es demasiado grande. Tamaño máximo: 5MB');
             return false;
@@ -78,35 +75,30 @@ const ImageUploadSection = ({
         console.log('File object:', info.file);
         console.log('File status:', info.file?.status);
 
-        // Check if the upload was cancelled or no file was selected
         if (!info.file) {
             console.log("No file in info object, upload was likely cancelled");
             return;
         }
 
-        // Check if the file status indicates removal, cancellation, or error
         if (info.file.status === 'removed' || info.file.status === 'error') {
             console.log(`Upload ${info.file.status} for ${key}`);
             return;
         }
 
-        // Get the actual file object - prioritize originFileObj over file
         const fileToUpload = info.file.originFileObj || info.file;
 
         console.log("File to upload:", fileToUpload);
         console.log("File instanceof File:", fileToUpload instanceof File);
         console.log("File type:", typeof fileToUpload);
 
-        // Ensure we have a valid File object
         if (!fileToUpload || !(fileToUpload instanceof File)) {
             console.error("Invalid file object:", fileToUpload);
             message.error("Error: Archivo no válido");
             return;
         }
 
-        // Validate file
         if (!validateFile(fileToUpload)) {
-            return; // Error message already shown in validateFile
+            return;
         }
 
         console.log("Valid file details:", {
@@ -116,7 +108,6 @@ const ImageUploadSection = ({
             lastModified: fileToUpload.lastModified
         });
 
-        // Validate required data
         if (!biosite?.id) {
             console.error("Biosite ID is missing");
             message.error("Error: ID del biosite no disponible");
@@ -138,7 +129,6 @@ const ImageUploadSection = ({
 
             let imageUrl: string;
 
-            // Use the specific backend endpoints
             if (key === 'avatarImage') {
                 imageUrl = await uploadBiositeAvatar(fileToUpload, biosite.id);
             } else {
@@ -152,16 +142,15 @@ const ImageUploadSection = ({
                 throw new Error("No se pudo obtener la URL de la imagen");
             }
 
-            // Validate the uploaded image URL
             if (!isValidImageUrl(imageUrl)) {
                 console.error("Uploaded image URL is invalid:", imageUrl);
                 throw new Error("La URL de la imagen subida no es válida");
             }
 
-            // Update preview immediately
             const previewUpdate = {
                 [key]: imageUrl
             };
+
             updatePreview(previewUpdate);
 
             message.success(`${key === 'avatarImage' ? 'Avatar' : 'Imagen de portada'} actualizada correctamente`);
@@ -173,7 +162,6 @@ const ImageUploadSection = ({
             console.error("Error message:", error?.message);
             console.error("Error response:", error?.response?.data);
 
-            // More specific error handling
             let errorMessage = "Error al subir la imagen";
 
             if (error?.message) {
@@ -186,7 +174,6 @@ const ImageUploadSection = ({
         }
     };
 
-    // Custom upload function that handles the file properly
     const customUpload = (options: any, key: "avatarImage" | "backgroundImage") => {
         const { file, onSuccess, onError } = options;
 
@@ -195,19 +182,16 @@ const ImageUploadSection = ({
         console.log('File type:', file.type);
         console.log('File size:', file.size);
 
-        // Validate file
         if (!validateFile(file)) {
             onError(new Error('Invalid file'));
             return;
         }
 
-        // Create the upload info object that matches Antd's structure
         const uploadInfo = {
             file: file,
             fileList: [file]
         };
 
-        // Call our handleUpload function
         handleUpload(uploadInfo, key)
             .then(() => {
                 onSuccess({}, file);
@@ -218,9 +202,8 @@ const ImageUploadSection = ({
             });
     };
 
-    const canEditCover =  role === "SUPER_ADMIN";
+    const canEditCover =  role === "SUPER_ADMIN" || role === "ADMIN";
 
-    // Get safe image URLs with fallback
     const safeAvatarImage = isValidImageUrl(biosite.avatarImage) ? biosite.avatarImage : placeholderAvatar;
     const safeBackgroundImage = isValidImageUrl(biosite.backgroundImage) ? biosite.backgroundImage : placeholderBackground;
 

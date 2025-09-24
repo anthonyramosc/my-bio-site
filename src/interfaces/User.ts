@@ -9,6 +9,7 @@ export interface CreateBiositeDto {
 
 export interface CreateUserDto {
     email: string;
+    cedula: string; // Añadido campo cedula como requerido
     password: string;
     name?: string;
     parentId?: string;
@@ -18,6 +19,7 @@ export interface CreateUserDto {
 export interface CreatedUser {
     id: string;
     email: string;
+    cedula?: string; // Añadido campo cedula como opcional en la respuesta
     name?: string;
     parentId?: string;
     role?: string;
